@@ -1,0 +1,37 @@
+{
+	"maxConnectionsPerIp": 16,
+	"maxConnectionsPerAdminIp": -1,
+	"maxPlayersInWorld": 0,
+	"maxConnections": 0,
+	"maxChatLength": 128,
+    "CountryBan": false,
+	"BannedCountries": [],
+    "ignoreErrors": true,
+	"showErrors": true,
+	"showFormattedErrors": false,
+	"altColors": false,
+	"databaseStoreSize": 16,
+	"worldborder": {
+		"enabled": true,
+		"x": 625,
+		"y": 625
+	},
+	"antiProxy": {
+		"status": false,
+		"vpnCheck": false,
+		"limit": 1000
+	},
+	"port": 9001,
+	"adminPort": 9002,
+	"maxNickLength": 16,
+	"messages": {
+		"unbanMessage": "If you were banned falsely, dm scar17off#7396",
+		"closeMsg": "Server is restarting...",
+		"defaultBanReason": "No reason"
+	},
+	"captcha": {
+        "enabled": false,
+		"security": 0,
+		"clientSideVerificationKey": "CaptchA"
+	}
+}

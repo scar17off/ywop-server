@@ -1,0 +1,58 @@
+{
+	"none": {
+		"fullName": "None",
+		"prefix": "",
+		"chatColor": "",
+		"placeBucket": "0x0",
+		"chatBucket": "0x0",
+		"commands": [],
+		"devChat": false,
+		"canChat": true,
+		"hideID": false,
+		"default": false,
+		"gamePermissions": [],
+		"id": 0
+	},
+	"user": {
+		"fullName": "User",
+		"prefix": "",
+		"chatColor": "",
+		"placeBucket": "100x2",
+		"chatBucket": "4x6",
+		"commands": ["help", "nick", "adminlogin", "modlogin", "disconnect", "pass", "tell", "logout"],
+		"devChat": false,
+		"canChat": true,
+		"hideID": false,
+		"default": true,
+		"gamePermissions": [],
+		"id": 1
+	},
+	"moderator": {
+		"fullName": "Moderator",
+		"prefix": "(M)",
+		"chatColor": "#86ff41",
+		"placeBucket": "160x2",
+		"chatBucket": "32x0",
+		"commands": ["help", "nick", "adminlogin", "modlogin", "disconnect", "pass", "tell", "kick", "kickip", "banip", "ban", "unbanip", "getid", "whois", "tp", "logout", "vanish", "color", "clear", "s", "hiderank", "pixellog", "l"],
+		"devChat": false,
+		"canChat": true,
+		"hideID": true,
+		"default": false,
+		"gamePermissions": ["protect", "paste", "clearChunks"],
+		"id": 2
+	},
+	"admin": {
+		"fullName": "Admin",
+		"prefix": "(A)",
+		"chatColor": "#ff4f4f",
+		"placeBucket": "1x0",
+		"chatBucket": "32x0",
+		"commands": ["help", "nick", "adminlogin", "modlogin", "disconnect", "setprop", "pass", "tell", "tellraw", "setpbucket", "kick", "kickip", "banip", "ban", "unbanip", "getid", "whois", "setrank", "bans", "tp", "tpall", "sayraw", "bc", "ao", "save", "logout", "vanish", "color", "clear", "s", "hiderank", "kickall", "pl", "pixellog", "l", "mem", "network", "baninfo"],
+		"devChat": true,
+		"canChat": true,
+		"hideID": true,
+		"default": false,
+		"gamePermissions": ["protect", "paste", "clearChunks", "editOutsideBorder", "anyDrawDistance", "bypassMaxChatLength"],
+		"id": 3
+	}
+}
