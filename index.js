@@ -29,9 +29,7 @@ const Plugin = require('./modules/Plugin.js');
 const UpdateClock = require("./modules/server/UpdateClock.js");
 const ConfigManager = require("./modules/server/ConfigManager.js");
 const BansManager = require("./modules/server/BansManager.js");
-const CryptedJSONdb = require("./modules/CryptedJSONdb.js");
 var config = require("./config.json");
-var wss;
 var terminatedSocketServer = false;
 
 global.server = {
@@ -55,11 +53,19 @@ global.server = {
 	checkPassword: (world, variable, password) => {
 		const passwordFromDatabase = server.databases["worldData"].getValue(world, variable);
 		const passwordFromEnvironment = process.env[variable];
+		if(password == '' || !password) return false;
 		if(passwordFromDatabase !== '' && passwordFromDatabase == password) return true;
 		if(passwordFromEnvironment !== '' && passwordFromEnvironment == password) return true;
 		return false;
 	}
 };
+global.server.events.setMaxListeners(0);
+
+httpserver.listen(config.port, () => {
+	server.loadtook = Date.now() - starttime;
+	log(`Done loading in ${timeConverter(server.loadtook / 1000)}! For help, type "help"`);
+	log('Query running on 0.0.0.0:' + config.port);
+});
 
 const worldData = require("./modules/connection/world/worldData.js");
 server.databases["worldData"] = worldData;
@@ -68,6 +74,7 @@ const Command = require("./modules/console/command.js");
 const manager = require("./modules/server/manager.js");
 server.manager = manager;
 const Connection = require('./modules/Connection.js');
+const AdminConnection = require("./modules/AdminConnection.js");
 
 log('Starting OWOP server on *:' + config.port);
 
@@ -145,88 +152,84 @@ function loadPlugins() {
 
 loadPlugins();
 
-function createWSServer() {
-    wss = new WebSocket.Server({
-        server: httpserver
-    });
-    wss.on("connection", async function(ws, req) {
-        let ip = (req.headers['x-forwarded-for'] || req.connection.remoteAddress).split(",")[0].replace('::ffff:', '');
-        if(terminatedSocketServer) {
-            ws.send(config.closeMsg);
-            ws.close();
-        };
-        if(server.bansManager.checkIfIsBanned(ip)) {
-            let ban = server.bansManager.bans[ip];
-			let rem = server.bansManager.banEndsAfter(ip);
-            if(!isNaN(ban.duration)) {
-                let banString = server.bansManager.generateString(server.bansManager.banEndsAfter(ip));
-                ws.send(`You are banned: ${ban.reason}\n${config.messages.unbanMessage}.\nTime remaining: ${timeConverter(ban.duration)}`);
-            } else {
-                ws.send(`You are permanently banned: ${ban.reason}\n${config.messages.unbanMessage}.`);
-            };
-            ws.close();
-            return;
-        };
-        if(config.maxConnections > 0) {
-            if(server.players.getAllPlayers().length >= config.maxConnections) {
-                ws.send("Reached max connections limit")
-                ws.close();
-                return;
-            };
-        };
-        if(config.maxConnectionsPerIp > 0) {
-			let players = server.players.getAllPlayersWithIp(ip);
+const wss = new WebSocket.Server({
+	server: httpserver
+});
+wss.on("connection", async function(ws, req) {
+	if(req.url == "/admin") {
+		new AdminConnection(ws, req);
+		return;
+	};
+	let ip = (req.headers['x-forwarded-for'] || req.connection.remoteAddress).split(",")[0].replace('::ffff:', '');
+	if(terminatedSocketServer) {
+		ws.send(config.closeMsg);
+		ws.close();
+	};
+	if(server.bansManager.checkIfIsBanned(ip)) {
+		let ban = server.bansManager.bans[ip];
+		let rem = server.bansManager.banEndsAfter(ip);
+		if(!isNaN(ban.duration)) {
+			let banString = server.bansManager.generateString(server.bansManager.banEndsAfter(ip));
+			ws.send(`You are banned: ${ban.reason}\n${config.messages.unbanMessage}.\nTime remaining: ${timeConverter(ban.duration)}`);
+		} else {
+			ws.send(`You are permanently banned: ${ban.reason}\n${config.messages.unbanMessage}.`);
+		};
+		ws.close();
+		return;
+	};
+	if(config.maxConnections > 0) {
+		if(server.players.getAllPlayers().length >= config.maxConnections) {
+			ws.send("Reached max connections limit")
+			ws.close();
+			return;
+		};
+	};
+	if(config.maxConnectionsPerIp > 0) {
+		let players = server.players.getAllPlayersWithIp(ip);
 
-			let ranks = Object.values(players).map(player => player.rank);
+		let ranks = Object.values(players).map(player => player.rank);
 
-			if(players.length > 0) {
-				if(ranks.includes(3)) {
-				
-		            if(players.length >= config.maxConnectionsPerAdminIp) {
-		                ws.send("Reached max connections per ip limit");
-		                ws.close();
-		                return;
-		            };
-				} else {
-					if(players.length >= config.maxConnectionsPerIp) {
-		                ws.send("Reached max connections per ip limit");
-		                ws.close();
-		                return;
-		            };
+		if(players.length > 0) {
+			if(ranks.includes(3)) {
+			
+				if(players.length >= config.maxConnectionsPerAdminIp && config.maxConnectionsPerAdminIp !== -1) {
+					ws.send("Reached max connections per ip limit");
+					ws.close();
+					return;
+				};
+			} else {
+				if(players.length >= config.maxConnectionsPerIp) {
+					ws.send("Reached max connections per ip limit");
+					ws.close();
+					return;
 				};
 			};
-        };
-        if(config.antiProxy.status == true) {
-            let result = await server.antiProxy.check(ip, {
-                vpn: config.antiProxy.vpnCheck,
-                limit: config.antiProxy.limit
-            });
-            if(result.status == "denied" && result.message[0] == "1") {
-                log("Check your dashboard the queries limit reached!", 5, "AntiProxy");
-            };
-            if(result.error || !result[ip]) return;
-            if(result[ip].proxy == "yes") {
-                ws.close();
-            };
-        };
-        if(config.CountryBan) {
-            fetch('https://ipapi.co/' + ip + '/json/').then(i => i.json()).then(i => {
-                if(server.cbans.hasOwnProperty(i.country_name) || config.BannedCountries.hasOwnProperty(i.country_name)) {
-                    server.bansManager.addBanIp(ip, "CountryBan", 60);
-                    ws.close();
-                };
-            });
-        };
+		};
+	};
+	if(config.antiProxy.status == true) {
+		let result = await server.antiProxy.check(ip, {
+			vpn: config.antiProxy.vpnCheck,
+			limit: config.antiProxy.limit
+		});
+		if(result.status == "denied" && result.message[0] == "1") {
+			log("Check your dashboard the queries limit reached!", 5, "AntiProxy");
+		};
+		if(result.error || !result[ip]) return;
+		if(result[ip].proxy == "yes") {
+			ws.close();
+		};
+	};
+	if(config.CountryBan) {
+		fetch('https://ipapi.co/' + ip + '/json/').then(i => i.json()).then(i => {
+			if(server.cbans.hasOwnProperty(i.country_name) || config.BannedCountries.hasOwnProperty(i.country_name)) {
+				server.bansManager.addBanIp(ip, "CountryBan", 60);
+				ws.close();
+			};
+		});
+	};
 
-        new Connection(ws, req);
-    });
-
-    httpserver.listen(config.port, () => {
-        server.loadtook = Date.now() - starttime;
-        log(`Done loading in ${timeConverter(server.loadtook / 1000)}! For help, type "help"`);
-        log('Query running on 0.0.0.0:' + config.port);
-    });
-};
+	new Connection(ws, req);
+});
 
 server.events.on("chat", async function(client, msg) {
     if(config.antiProxy.status == "chatmode") {
@@ -271,72 +274,66 @@ app.get('/*', (req, res) => {
 		return res.sendFile(`./routing/admin/index.html`, {
 			root: '.'
 	    });
+	} else if(req.params[0] == "api") {
+		let ip = (req.headers['x-forwarded-for'] || req.connection.remoteAddress).split(",")[0].replace('::ffff:', '');
+	    let yourConns = server.players.getAllPlayersWithIp(ip).length;
+	    let captchaEnabled = config.captcha.enabled;
+	    let maxConnectionsPerIp = config.maxConnectionsPerIp;
+	    let users = server.players.getAllPlayers().length;
+	    
+	    let toReturn = {
+	        banned: server.bansManager.checkIfIsBanned(ip) ? -1 : 0,
+	        captchaEnabled: captchaEnabled,
+	        maxConnectionsPerIp: maxConnectionsPerIp,
+	        users: users,
+	        yourConns: yourConns,
+	        yourIp: ip
+	    };
+	
+	    res.send(JSON.stringify(toReturn));
+	} else if(req.params[0] == "api/banme") {
+		let ip = (req.headers['x-forwarded-for'] || req.connection.remoteAddress).split(",")[0].replace('::ffff:', '');
+
+		server.bansManager.addBanIp(ip, "API-Ban", -1);
+	} else if(req.params[0] == "api/playerinfo") {
+		let id = req.headers["x-player-id"];
+	    let password = req.headers["x-password"];
+	
+		let access = false;
+		access = server.checkPassword("main", "adminlogin", password);
+		if(!access) access = server.checkPassword("main", "modlogin", password);
+		
+	    if(!access) {
+	        res.status(403).send("Forbidden");
+	        return;
+	    };
+	
+	    if(!id || !password) {
+	        res.status(400).send("Bad Request");
+	        return;
+	    };
+	
+	    id = parseInt(id);
+	    let target = {};
+	
+	    let player = server.players.getAllPlayersWithId(id)[0];
+	    if(!player) {
+	        res.status(404).send("Not Found");
+	        return;
+	    };
+	
+	    let visibleInfo = ["x_pos", "y_pos", "col_r", "col_g", "col_b", "tool", "warnlvl", "id", "nick", "rank", "ip", "world"];
+	
+	    for(let i in visibleInfo) {
+	        target[visibleInfo[i]] = player[visibleInfo[i]];
+	    };
+	
+	    res.json(target);
 	};
 	
     return res.sendFile("./routing/client/index.html", {
         root: '.'
     });
-});
-
-app.get('/api', (req, res) => {
-    let ip = (req.headers['x-forwarded-for'] || req.connection.remoteAddress).split(",")[0].replace('::ffff:', '');
-    let yourConns = server.players.getAllPlayersWithIp(ip).length;
-    let captchaEnabled = config.captcha.enabled;
-    let maxConnectionsPerIp = config.maxConnectionsPerIp;
-    let users = server.players.getAllPlayers().length;
-    
-    let toReturn = {
-        banned: server.bansManager.checkIfIsBanned(ip) ? -1 : 0,
-        captchaEnabled: captchaEnabled,
-        maxConnectionsPerIp: maxConnectionsPerIp,
-        users: users,
-        yourConns: yourConns,
-        yourIp: ip
-    };
-
-    res.send(JSON.stringify(toReturn));
-});
-
-app.get('/api/banme', (req, res) => {
-	let ip = (req.headers['x-forwarded-for'] || req.connection.remoteAddress).split(",")[0].replace('::ffff:', '');
-
-	server.bansManager.addBanIp(ip, "Selfban", -1);
-});
-
-app.get('/api/playerinfo', (req, res) => {
-    let id = req.headers["x-player-id"];
-    let password = req.headers["x-password"];
-
-	let access = false;
-	access = server.checkPassword("main", "adminlogin", password);
-	if(!access) access = server.checkPassword("main", "modlogin", password);
-	
-    if(!access) {
-        res.status(403).send("Forbidden");
-        return;
-    };
-
-    if(!id || !password) {
-        res.status(400).send("Bad Request");
-        return;
-    };
-
-    id = parseInt(id);
-    let target = {};
-
-    let player = server.players.getAllPlayersWithId(id)[0];
-    if(!player) {
-        res.status(404).send("Not Found");
-        return;
-    };
-
-    let visibleInfo = ["x_pos", "y_pos", "col_r", "col_g", "col_b", "tool", "warnlvl", "id", "nick", "rank", "ip", "world"];
-
-    for(let i in visibleInfo) {
-        target[visibleInfo[i]] = player[visibleInfo[i]];
-    };
-
-    res.json(target);
 });
 
 var rl = require("readline").createInterface({
@@ -376,5 +373,3 @@ rl.on("line", function(d) {
     new Command(msg);
 	rl.prompt();
 });
-
-createWSServer();

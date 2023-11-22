@@ -1,7 +1,8 @@
 /*
 Big thanks to FP(FunPoster/system2k) for converting eldit file extension .pxr to Node JS
 */
-var fs = require("graceful-fs");
+
+const fs = require("graceful-fs");
 
 var database_path = "./worlds/";
 var pchunksPath = "pchunks.bin";

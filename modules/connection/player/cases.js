@@ -160,20 +160,20 @@ class Case {
 				    var b = this.dv.getUint8(10);
 
 				    var currentChunkColor = server.manager.get_chunk(this.world.name, x, y);
-					if(!currentChunkColor) currentChunkColor = [0, 0, 0];
-				    if(currentChunkColor[0] !== r || currentChunkColor[1] !== g || currentChunkColor[2] !== b) {
-				        server.events.emit("clearChunk", this.client, x, y, [r, g, b]);
+
+					var newData = new Uint8Array(16 * 16 * 3); for (var i = 0; i < 16 * 16 * 3;) { newData[i++] = 255; newData[i++] = 255; newData[i++] = 255; };
+
+				    server.events.emit("clearChunk", this.client, x, y, [r, g, b]);
 				
-				        var newData = new Uint8Array(16 * 16 * 3);
-				        for(var i = 0; i < 16 * 16 * 3;) {
-				            newData[i++] = r;
-				            newData[i++] = g;
-				            newData[i++] = b;
-				        };
-				        server.manager.set_chunk_rgb(this.world.name, x, y, newData);
-				        var newTileUpdated = getTile(this.world.name, x, y);
-				        server.players.sendToWorld(this.world.name, newTileUpdated);
+				    var newData = new Uint8Array(16 * 16 * 3);
+				    for(var i = 0; i < 16 * 16 * 3;) {
+				        newData[i++] = r;
+				        newData[i++] = g;
+				        newData[i++] = b;
 				    };
+				    server.manager.set_chunk_rgb(this.world.name, x, y, newData);
+				    var newTileUpdated = getTile(this.world.name, x, y);
+				    server.players.sendToWorld(this.world.name, newTileUpdated);
                 } else {
                     this.client.ws.close();
                 };
@@ -192,12 +192,11 @@ class Case {
 					var g = newData[1];
 					var b = newData[2];
 					var currentChunkColor = server.manager.get_chunk(this.world.name, x, y);
-					if(currentChunkColor[0] !== r || currentChunkColor[1] !== g || currentChunkColor[2] !== b) {
-					    server.events.emit("paste", this.client, x, y, newData);
-					    server.manager.set_chunk_rgb(this.world.name, x, y, newData);
-					    var newTileUpdated = getTile(this.world.name, x, y);
-					    server.players.sendToWorld(this.world.name, newTileUpdated);
-					};
+					
+					server.events.emit("paste", this.client, x, y, newData);
+					server.manager.set_chunk_rgb(this.world.name, x, y, newData);
+					var newTileUpdated = getTile(this.world.name, x, y);
+					server.players.sendToWorld(this.world.name, newTileUpdated);
                 } else {
                     this.client.ws.close();
                 };

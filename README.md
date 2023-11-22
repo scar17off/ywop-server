@@ -25,6 +25,6 @@ plugins with '-' on start or without '.js' at end will be ignored
 <br>
 `/plugins/Discord Gateway/config.json` (CHANNEL ID, GUILD ID)
 ## Console
-### There are a console commands, you can see all them by typing `help`.
+### There are console commands, you can access them by typing `help`.
 ## Plugin creation
 ### For plugin developers i made a documentations with a good examples, so you can modify the game without editing thousands of server code.

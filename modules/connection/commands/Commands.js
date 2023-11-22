@@ -4,18 +4,6 @@ const os = require('os');
 const log = require('../.././console/log.js');
 const ranks = require("../player/ranks.json");
 
-let allowSpeedTest = true;
-try {
-    const speedTest = require('speedtest-net');
-} catch(err) {
-	let simplifiedError = "";
-	err = err.toString();
-    if(err.includes("Cannot find module 'speedtest-net'")) {
-		simplifiedError = "Error: Cannot find module 'speedtest-net'. Install Python 2.4 or newer.";
-		allowSpeedTest = simplifiedError;
-	};
-};
-
 const fetch = (...args) => import('node-fetch').then(({
      default: fetch
 }) => fetch(...args));
@@ -165,45 +153,6 @@ class Commands {
             };
         };
     }
-	network() {
-		function getIPAddresses() {
-    		const interfaces = os.networkInterfaces();
-		    const addresses = [];
-		    for(const name in interfaces) {
-		        const iface = interfaces[name];
-		        for(const info of iface) {
-		            if(info.family === 'IPv4' && !info.internal) {
-		                addresses.push(info.address);
-		            };
-		        };
-		    };
-		    return addresses;
-		};
-		let ips = getIPAddresses();
-		if(allowSpeedTest == true) {
-			speedTest({
-		        maxTime: 5000
-		    }, function(err, data) {
-		        if(err) {
-		            log(err, 1);
-		        } else {
-		            const downloadSpeed = (data.speeds.download / 1000000).toFixed(2);
-		            const uploadSpeed = (data.speeds.upload / 1000000).toFixed(2);
-		            const downloaded = (data.bytesReceived / 1024).toFixed(2);
-		            const uploaded = (data.bytesSent / 1024).toFixed(2);
-		
-		            this.client.send(`Download speed: ${downloadSpeed} MB/s`);
-		            this.client.send(`Upload speed: ${uploadSpeed} MB/s`);
-		            this.client.send(`Total downloaded: ${downloaded} KiB/s`);
-		            this.client.send(`Total uploaded: ${uploaded} KiB/s`);
-		        };
-		    });
-		} else {
-			this.client.send("An error occurred. Check the console for more information.");
-			log(allowSpeedTest, 1);
-		};
-		this.client.send("Server IPs: " + ips.join(", "));
-	};
     mem() {
         let msg = "";
         msg += "The information about server performance could be wrong, because the server was made for Windows servers.\n";
@@ -298,7 +247,7 @@ class Commands {
     modlogin(password) {
         if(server.checkPassword(this.client.world, "modlogin", password)) {
             this.client.setRank(2);
-            this.client.send(`<span style="color: #7ed433">[Server] You are now an moderator. Do /help for a list of commands.</span>`);
+            this.client.send(`<span style="color: #7ed433">[Server] You are now a moderator. Do /help for a list of commands.</span>`);
         } else {
             this.client.send(`<span style="color: #ed2b2b">[Server] Wrong password.</span>`);
         };

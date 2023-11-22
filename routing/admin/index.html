@@ -1,0 +1,153 @@
+<html>
+    <head>
+        <title>YWOP: Admin Portal</title>
+    </head>
+
+    <body>
+        <header>
+            <button>Overview</button>
+            <button>RCON</button>
+            <button>Players</button>
+        </header>
+        <div>
+            <div id="tab-overview">
+                
+            </div>
+            <div id="tab-rcon" hidden>
+                
+            </div>
+            <div id="tab-players" hidden>
+                <table id="players-table">
+					<tr id="players-tr">
+						<th id="players-world">WORLD</th>
+						<th id="players-id">ID</th>
+						<th id="players-rank">RANK</th>
+						<th id="players-ip">IP</th>
+						<th id="players-nick">NICK</th>
+						<th id="players-color">COLOR</th>
+						<th id="players-x">X</th>
+						<th id="players-y">Y</th>
+						<th id="players-actions">ACTIONS</th>
+					</tr>
+				</table>
+            </div>
+        </div>
+    </body>
+
+    <script>
+		const playersTable = document.getElementById("players-table");
+		const defaultPlayersTableHTML = playersTable.innerHTML;
+		
+        const socket = new WebSocket(location.href.replace(location.protocol, "wss:"));
+
+        socket.addEventListener("message", message => {
+			message = JSON.parse(message.data);
+
+			if(message.type == "redirect") {
+				location.pathname = message.path;
+			};
+
+			if(message.type == "players") {
+				playersTable.innerHTML = defaultPlayersTableHTML;
+
+				const players = message.content;
+
+				for(let i in players) {
+					const player = players[i];
+					const tr = document.createElement("tr");
+
+					tr.innerHTML = `
+<td>
+	<a href="${location.origin}/${player.world}">${player.world}</a>
+</td>
+<td>${player.id}</td>
+<td>${player.rank}</td>
+<td>${player.ip}</td>
+<td>${player.nick}</td>
+<td>
+	<div title="RGB: ${player.col_r}, ${player.col_g}, ${player.col_b}" style="background-color: rgb(${player.col_r}, ${player.col_g}, ${player.col_b}); width: 16px; height: 16px; margin-left: 47%;"></div>
+</td>
+<td>${Math.floor(player.x_pos / 16)}</td>
+<td>${Math.floor(player.y_pos / 16)}</td>
+<td>
+	<button onclick="socket.send(JSON.stringify({ type: 'kick', target: ${player.id}, world: '${player.world}' }))">Kick</button>
+	<button>Ban</button>
+	<button onclick="socket.send(JSON.stringify({ type: 'setrank', target: ${player.id}, world: '${player.world}', rank: parseInt(prompt('Rank ID:')) }))">Set rank</button>
+	<button>Whois</button>
+</td>
+`;
+
+					playersTable.appendChild(tr);
+				};
+			};
+        });
+
+		socket.addEventListener("open", () => {
+			socket.send(JSON.stringify({ type: "auth", password: localStorage.adminlogin }));
+		});
+        
+        function setTab(name) {
+            const tabs = Array.from(document.querySelectorAll("[id^='tab-']"));
+
+            tabs.forEach(tab => {
+                tab.hidden = true;
+
+                if(tab.id.slice("tab-".length) == name)
+                    tab.hidden = false;
+            });
+        };
+
+        const tabButtons = document.querySelectorAll("header button");
+
+        tabButtons.forEach(button => {
+            button.addEventListener("click", () => {
+                setTab(button.innerText.toLowerCase())
+            });
+        });
+    </script>
+    
+    <style>
+		table {
+			border-collapse: collapse;
+			text-align: center;
+			width: -webkit-fill-available;
+			border: solid 1px rgb(0, 0, 0);
+		}
+		th, td {
+			font-family: sans-serif;
+			font-size: 12.5px;
+			padding: 2px;
+			text-align: center;
+			border-color: rgb(200, 200, 200);
+			border-width: 1px;
+			border-style: double;
+			border-right-style: none;
+			border: solid 1px rgb(55, 55, 55);
+		}
+		tr:first-child {
+			text-align: center;
+			border: solid 1px rgb(55, 55, 55);
+		}
+        header button {
+            border: solid 1px;
+            width: 15vh;
+            height: 3vh;
+        }
+        header button:hover {
+             background-color: rgb(209, 209, 209);
+        }
+        button {
+            border: solid 1px;
+        }
+        button:hover {
+           	background-color: rgb(209, 209, 209);
+        }
+		header {
+			text-align: center;
+		}
+        body {
+            margin: 1px;
+            padding: 1px;
+        }
+    </style>
+</html>

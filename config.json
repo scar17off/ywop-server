@@ -21,8 +21,7 @@
 		"vpnCheck": false,
 		"limit": 1000
 	},
-	"port": 9001,
-	"adminPort": 9002,
+	"port": 443,
 	"maxNickLength": 16,
 	"messages": {
 		"unbanMessage": "If you were banned falsely, dm scar17off#7396",

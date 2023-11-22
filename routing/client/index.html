@@ -769,18 +769,9 @@ td {
 			<span class="title">Hub</span>
 			<button id="hub-close" class="windowCloseButton"></button>
 			<div class="content whitetext">
-				<button id="tabbtn-account" class="hubtabbtn"></button>
 				<button id="tabbtn-information" class="hubtabbtn"></button>
 				<button id="tabbtn-settings" class="hubtabbtn"></button>
-				<div id="tab-account" class="hubtab">
-					<a href="https://discord.com/api/oauth2/authorize?client_id=898899975008837633&redirect_uri=https%3A%2F%2Fywop.scar17off.repl.co%2Fauth%2Fdiscord&response_type=code&scope=identify" class="discord-btn">Log in with Discord</a>
-					<div class="text-4xl mt-3 flex items-center font-medium" >
-    					<img src='' id="avatar" class="rounded-full w-12 h-12 mr-3"/>
-    					<div id="name"></div>
-						</div>
-						<a href="/" class="text-sm mt-5">Logout</a>
-				</div>
-				<div id="tab-information" class="hubtab" hidden>
+				<div id="tab-information" class="hubtab">
 					Rank: <label>1</label>
 				</div>
 				<div id="tab-settings" class="hubtab" hidden>
@@ -819,23 +810,5 @@ td {
 			};
 		};
 	</script>
-	<script>
-        window.onload = () => {
-            const [accessToken, tokenType] = [localStorage.getItem('access_token'), localStorage.getItem('token_type')];
-
-            fetch('https://discord.com/api/users/@me', {
-                headers: {
-                    authorization: `${tokenType} ${accessToken}`,
-                },
-            }).then(result => result.json())
-                .then(response => {
-                    console.log(response);
-                    const { username, discriminator, avatar, id} = response;
-                    document.getElementById('name').innerText = ` ${username}#${discriminator}`;
-                    document.getElementById("avatar").src = `https://cdn.discordapp.com/avatars/${id}/${avatar}.jpg`;
-                })
-            .catch(console.error);
-        };
-	</script>
-<!-- 	<script>if(location.host !== "ywop.scar17off.repl.co") location.reload();</script> -->
+	<!-- 	<script>if(location.host !== "ywop.scar17off.repl.co") location.reload();</script> -->
 </html>
