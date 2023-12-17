@@ -9,3 +9,4 @@ replit.nix
 .upm
 .cache
 client-dist/
+.env
