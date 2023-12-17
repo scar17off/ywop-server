@@ -1,2 +1,4 @@
+#!/bin/sh
+
 node index.js
-pause
+read -p "Press Enter to continue..."
