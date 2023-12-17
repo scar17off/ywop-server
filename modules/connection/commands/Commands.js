@@ -1,6 +1,4 @@
 var config = require("../../../config");
-const si = require('systeminformation');
-const os = require('os');
 const log = require('../.././console/log.js');
 const ranks = require("../player/ranks.json");
 
@@ -152,38 +150,6 @@ class Commands {
                 this.client.send("You don't have permission!");
             };
         };
-    }
-    mem() {
-        let msg = "";
-        msg += "The information about server performance could be wrong, because the server was made for Windows servers.\n";
-        msg += "Uptime: " + timeConverter(process.uptime()) + "\n";
-        const totalCores = os.cpus()
-            .length;
-        const startTime = Date.now() - os.uptime() * 1000;
-        const startUsage = os.cpus()
-            .reduce((acc, core) => acc + core.times.user + core.times.nice + core.times.sys + core.times.irq, 0);
-        setTimeout(() => {
-            const endTime = Date.now();
-            const endUsage = os.cpus()
-                .reduce((acc, core) => acc + core.times.user + core.times.nice + core.times.sys + core.times.irq, 0);
-            const elapsedSeconds = (endTime - startTime) / 1000;
-            const cpuPercentage = ((endUsage - startUsage) / (elapsedSeconds * totalCores * 100)) * 100;
-            msg += `CPU usage: ${cpuPercentage.toFixed(2)}%\n`;
-        }, 1000);
-
-        const totalBytes = os.totalmem();
-        const freeBytes = os.freemem();
-        const used = totalBytes - freeBytes;
-        msg += 'Memory usage: ' + (used / 1024 / 1024)
-            .toFixed(2) + 'MB\n';
-
-        si.fsSize()
-            .then(data => {
-                msg += 'Storage usage: ' + (data[0].used / 1024 / 1024 / 1024)
-                    .toFixed(2) + 'GB';
-                this.client.send(msg);
-            })
-            .catch(error => console.error('Error retrieving storage usage:', error));
     }
     s(targetId) {
         let target;
