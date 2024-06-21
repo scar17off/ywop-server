@@ -1,16 +1,18 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>Your World Of Pixels</title>
+		<title>World of Pixels</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<meta name="viewport" content="width=device-width,initial-scale=1.0">
-		<meta name="description" content="YourWorldOfPixels is an infinite white space where users can click to paste pixels to create beautiful or terrible art.">
-		<meta name="keywords" content="pixel, game, draw, online, cursors">
-		<style>
-@font-face {
+		<meta name="description" content="Draw pixels with other people in real-time on an (almost) infinite canvas!">
+		<meta name="keywords" content="pixel, game, draw, online, cursors, canvas, world">
+
+		<!--<script async src="https://arc.io/widget.min.js#VVmYw2Lc"></script>-->
+		<script src="https://www.paypalobjects.com/donate/sdk/donate-sdk.js" charset="UTF-8" defer></script>
+		<style>@font-face {
     font-family: pixel-op;
-    src: url(font/pixeloperator.woff2) format('woff2'),
-         url(font/pixeloperator.woff) format('woff');
+    src: url(/font/pixeloperator.woff2) format('woff2'),
+         url(/font/pixeloperator.woff) format('woff');
     font-weight: normal;
     font-style: normal;
 }
@@ -25,7 +27,7 @@
 	height: 16px;
 	width: 16px;
 	border: 6px solid;
-	border-image: url(img/button_pressed.png) 6 repeat;
+	border-image: url(../img/button_pressed.png) 6 repeat;
 	background-color: #4d313b;
 	border-width: 6px;
 	background-origin: border-box;
@@ -35,8 +37,8 @@
 	height: 16px;
 	width: 16px;
 	border: 6px solid;
-	border-image: url(img/button.png) 6 repeat;
-	background-image: url(img/gui.png);
+	border-image: url(/img/button.png) 6 repeat;
+	background-image: url(/img/gui.png);
 	background-color: #ABA389;
 	border-width: 6px;
 	background-origin: border-box;
@@ -47,11 +49,11 @@
 }
 ::-webkit-scrollbar-button:active {
 	background-color: #8d8671;
-	border-image: url(img/button_pressed.png) 6 repeat;
+	border-image: url(/img/button_pressed.png) 6 repeat;
 }
 ::-webkit-scrollbar-button:disabled {
 	background-color: #8d8671;
-	border-image: url(img/button_pressed.png) 6 repeat;
+	border-image: url(/img/button_pressed.png) 6 repeat;
 }
 ::-webkit-scrollbar-button:vertical:increment {
 	background-position: -32px 0px;
@@ -79,7 +81,7 @@
 }
 ::-webkit-scrollbar-thumb {
 	border: 6px solid;
-	border-image: url(img/button.png) 6 repeat;
+	border-image: url(/img/button.png) 6 repeat;
 	background-color: #ABA389;
 	border-width: 6px;
 }
@@ -88,12 +90,12 @@
 }
 ::-webkit-scrollbar-thumb:active {
 	background-color: #8d8671;
-	border-image: url(img/button_pressed.png) 6 repeat;
+	border-image: url(/img/button_pressed.png) 6 repeat;
 }.context-menu {
 	position: absolute;
 	border: 5px #aba389 solid;
-	-o-border-image: url(img/small_border.png) 5 repeat;
-	   border-image: url(img/small_border.png) 5 repeat;
+	-o-border-image: url(/img/small_border.png) 5 repeat;
+	   border-image: url(/img/small_border.png) 5 repeat;
 	border-image-outset: 1px;
 	background-color: #7e635c;
 	box-shadow: 0px 0px 5px #000;
@@ -112,14 +114,13 @@
 
 body {
 	background-color: #d1d1d1;
-	background-image: url(img/unloaded.png);
+	background-image: url(/img/unloaded.png);
 	background-size: 16px;
 }
 
 html {
 	-webkit-user-select: none;
 	   -moz-user-select: none;
-	    -ms-user-select: none;
 	        user-select: none;
 }
 
@@ -134,7 +135,6 @@ hr {
 .selectable {
 	-webkit-user-select: text;
 	   -moz-user-select: text;
-	    -ms-user-select: text;
 	        user-select: text;
 }
 
@@ -143,8 +143,7 @@ hr {
 	padding-top: 1px; /* fix captcha window not being pixel perfect */
 	top: 50%;
 	left: 50%;
-	-webkit-transform: translate(-50%, -50%);
-	        transform: translate(-50%, -50%);
+	transform: translate(-50%, -50%);
 }
 
 .centeredChilds {
@@ -167,13 +166,10 @@ hr {
 	padding-top: 1px!important;
 	top: 0;
 	left: 50%;
-	-webkit-transform: translateX(-50%);
-	        transform: translateX(-50%);
+	transform: translateX(-50%);
 	border: none!important;
 	background-color: rgba(0, 0, 0, 0)!important;
-	transition: -webkit-transform 0.5s ease-out;
 	transition: transform 0.5s ease-out;
-	transition: transform 0.5s ease-out, -webkit-transform 0.5s ease-out;
 }
 button.winframe:active {
 	-o-border-image: inherit;
@@ -187,9 +183,7 @@ button.winframe:active {
 }
 
 img, #tool-select {
-	-ms-interpolation-mode: nearest-neighbor;
-	    image-rendering: -moz-crisp-edges;
-	    image-rendering: pixelated;
+	image-rendering: pixelated;
 }
 
 #load-scr {
@@ -199,10 +193,8 @@ img, #tool-select {
 	text-align: center;
 	font: 0/0 a;
 	pointer-events: none;
-	transition: -webkit-transform 1.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
 	transition: transform 1.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-	transition: transform 1.5s cubic-bezier(0.68, -0.55, 0.27, 1.55), -webkit-transform 1.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-	background-image: url(img/unloaded.png);
+	background-image: url(/img/unloaded.png);
 	box-shadow: 0 0 5px #000;
 }
 
@@ -222,9 +214,7 @@ img, #tool-select {
 	max-width: 50%;
 	min-width: 224px;
 	pointer-events: initial;
-	transition: -webkit-transform 1s;
 	transition: transform 1s;
-	transition: transform 1s, -webkit-transform 1s;
 }
 
 #noscript-msg, #status {
@@ -256,8 +246,8 @@ img, #tool-select {
 	background-color: #aba389;
 	border: 11px #aba389 solid;
 	border-width: 11px;
-	-o-border-image: url(img/window_out.png) 11 repeat;
-	   border-image: url(img/window_out.png) 11 repeat;
+	-o-border-image: url(/img/window_out.png) 11 repeat;
+	   border-image: url(/img/window_out.png) 11 repeat;
 	border-image-outset: 1px;
 	box-shadow: 0px 0px 5px #000;
 }
@@ -278,13 +268,13 @@ img, #tool-select {
 	width: 9px;
 	height: 9px;
 	padding: 0;
-	background-image: url(img/gui.png);
+	background-image: url(/img/gui.png);
 	background-position: -48px -32px;
 	background-color: #ff7979;
 	border: none;
 }
 button.windowCloseButton:active {
-	background-image: url(img/gui.png);
+	background-image: url(/img/gui.png);
 	background-position: -48px -41px;
 }
 .wincontainer { /* Item container of windows */
@@ -296,13 +286,13 @@ button.windowCloseButton:active {
 	background-color: #7e635c;
 	border: 5px #7e635c solid;
 	border-width: 5px;
-	-o-border-image: url(img/window_in.png) 5 repeat;
-	   border-image: url(img/window_in.png) 5 repeat;
+	-o-border-image: url(/img/window_in.png) 5 repeat;
+	   border-image: url(/img/window_in.png) 5 repeat;
 }
 #windows > div > div > input {
 	border: 6px #7e635c solid;
-	-o-border-image: url(img/small_border.png) 6 repeat;
-	   border-image: url(img/small_border.png) 6 repeat;
+	-o-border-image: url(/img/small_border.png) 6 repeat;
+	   border-image: url(/img/small_border.png) 6 repeat;
 	border-image-outset: 1px;
 }
 #windows > div > div > * {
@@ -311,26 +301,20 @@ button.windowCloseButton:active {
 
 button {
 	border: 6px #aba389 outset;
-	-o-border-image: url(img/button.png) 6 repeat;
-	   border-image: url(img/button.png) 6 repeat;
+	-o-border-image: url(/img/button.png) 6 repeat;
+	   border-image: url(/img/button.png) 6 repeat;
 	background-color: #aba389;
-	transition: -webkit-filter 0.125s;
 	transition: filter 0.125s;
-	transition: filter 0.125s, -webkit-filter 0.125s;
 }
 button:hover {
-	-webkit-filter: brightness(110%);
-	        filter: brightness(110%);
-	transition: -webkit-filter 0.125s;
+	filter: brightness(110%);
 	transition: filter 0.125s;
-	transition: filter 0.125s, -webkit-filter 0.125s;
 }
 button:active {
 	border-style: inset;
-	-o-border-image: url(img/button_pressed.png) 6 repeat;
-	   border-image: url(img/button_pressed.png) 6 repeat;
-	-webkit-filter: brightness(90%);
-	        filter: brightness(90%);
+	-o-border-image: url(/img/button_pressed.png) 6 repeat;
+	   border-image: url(/img/button_pressed.png) 6 repeat;
+	filter: brightness(90%);
 	transition: none;
 }
 button:focus {
@@ -339,7 +323,7 @@ button:focus {
 
 #clusters > canvas {
 	position: absolute;
-	background-image: url(img/unloaded.png);
+	background-image: url(/img/unloaded.png);
 	background-size: 8px;
 }
 #bucket-display {
@@ -352,11 +336,8 @@ button:focus {
 #xy-display, #playercount-display, #palette, #bucket-display {
 	position: absolute;
 	pointer-events: none;
-	-webkit-transform: translateY(-100%);
-	        transform: translateY(-100%);
-	transition: -webkit-transform 0.75s;
+	transform: translateY(-100%);
 	transition: transform 0.75s;
-	transition: transform 0.75s, -webkit-transform 0.75s;
 }
 #xy-display, #bucket-display {
 	padding-left: 2px;
@@ -373,8 +354,8 @@ button:focus {
 }
 #playercount-display, #xy-display, #bucket-display, #palette-create, #palette, .framed {
 	border: 5px #aba389 solid;
-	-o-border-image: url(img/small_border.png) 5 repeat;
-	   border-image: url(img/small_border.png) 5 repeat;
+	-o-border-image: url(/img/small_border.png) 5 repeat;
+	   border-image: url(/img/small_border.png) 5 repeat;
 	border-image-outset: 1px;
 	background-color: #7e635c;
 	box-shadow: 0px 0px 5px #000;
@@ -402,15 +383,13 @@ button:focus {
 	width: 36px;
 	height: 36px;
 	margin-left: 50%;
-	-webkit-transform: translate(-50%, -50%);
-	        transform: translate(-50%, -50%);
+	transform: translate(-50%, -50%);
 }
 
 #palette {
 	right: -5px;
 	top: 50%;
-	-webkit-transform: translateY(-50%) translateX(200%);
-	        transform: translateY(-50%) translateX(200%);
+	transform: translateY(-50%) translateX(200%);
 	width: 45px;
 	height: 40px;
 	box-sizing: border-box;
@@ -428,12 +407,11 @@ button:focus {
 	position: absolute;
 	right: 50px;
 	top: 50%;
-	-webkit-transform: translateY(-50%);
-	        transform: translateY(-50%);
+	transform: translateY(-50%);
 	width: 24px;
 	height: 24px;
 	box-sizing: border-box;
-	background-image: url(img/plus.png);
+	background-image: url(/img/plus.png);
 	background-repeat: no-repeat;
 	pointer-events: all;
 }
@@ -449,9 +427,7 @@ button:focus {
 	position: absolute;
 	left: -1px;
 	top: -9px;
-	transition: -webkit-transform 0.2s ease-out;
 	transition: transform 0.2s ease-out;
-	transition: transform 0.2s ease-out, -webkit-transform 0.2s ease-out;
 }
 #palette-colors > div {
 	width: 32px;
@@ -510,16 +486,15 @@ button:focus {
 	position: absolute;
 	top: 50%;
 	left: 50%;
-	-webkit-transform: translate(-50%, -50%);
-	        transform: translate(-50%, -50%);
+	transform: translate(-50%, -50%);
 	width: 80%;
 	max-width: 800px;
 
 	background-color: #aba389;
 	border: 11px #aba389 solid;
 	border-width: 11px;
-	-o-border-image: url(img/window_out.png) 11 repeat;
-	   border-image: url(img/window_out.png) 11 repeat;
+	-o-border-image: url(/img/window_out.png) 11 repeat;
+	   border-image: url(/img/window_out.png) 11 repeat;
 	border-image-outset: 1px;
 	box-shadow: 0px 0px 5px #000;
 }
@@ -542,8 +517,8 @@ button:focus {
 	background-color: #7e635c;
 	border: 5px #7e635c solid;
 	border-width: 5px;
-	-o-border-image: url(img/window_in.png) 5 repeat;
-	   border-image: url(img/window_in.png) 5 repeat;
+	-o-border-image: url(/img/window_in.png) 5 repeat;
+	   border-image: url(/img/window_in.png) 5 repeat;
 }
 #hub > .content > .links {
 	text-align: center;
@@ -561,8 +536,7 @@ button:focus {
 }
 
 #chat {
-	-webkit-transform: translateY(100%);
-	        transform: translateY(100%);
+	transform: translateY(100%);
 }
 .discord-btn {
   display: inline-block;
@@ -594,11 +568,8 @@ button:focus {
 	background-color: transparent;
 	pointer-events: none;
 	overflow: hidden;
-	transition: background-color 0.2s, box-shadow 0.2s, -webkit-transform 0.75s;
 	transition: background-color 0.2s, box-shadow 0.2s, transform 0.75s;
-	transition: background-color 0.2s, box-shadow 0.2s, transform 0.75s, -webkit-transform 0.75s;
-	-webkit-animation-fill-mode: forwards;
-	        animation-fill-mode: forwards;
+	animation-fill-mode: forwards;
 }
 #dev-chat {
 	left: 0;
@@ -611,11 +582,6 @@ button:focus {
 	overflow-y: auto;
 }
 
-@-webkit-keyframes fade {
-	from { opacity: 1; }
-	to { opacity: 0; }
-}
-
 @keyframes fade {
 	from { opacity: 1; }
 	to { opacity: 0; }
@@ -623,14 +589,10 @@ button:focus {
 
 #chat-messages > li {
 	background-color: rgba(0, 0, 0, 0.8);
-	-webkit-animation-name: fade;
-	        animation-name: fade;
-	-webkit-animation-duration: 3s;
-	        animation-duration: 3s;
-	-webkit-animation-delay: 15s;
-	        animation-delay: 15s;
-	-webkit-animation-fill-mode: forwards;
-	        animation-fill-mode: forwards;
+	animation-name: fade;
+	animation-duration: 3s;
+	animation-delay: 15s;
+	animation-fill-mode: forwards;
 	transition: background-color 0.2s;
 	white-space: pre-wrap;
 }
@@ -664,8 +626,7 @@ button:focus {
 
 #chat-messages.active > li {
 	background-color: initial;
-	-webkit-animation-duration: 0s;
-	        animation-duration: 0s;
+	animation-duration: 0s;
 	animation-direction: reverse;
 }
 
@@ -697,15 +658,7 @@ button:focus {
 	outline: none;
 }
 
-#chat-input::-webkit-input-placeholder {
-	color: #BBB;
-}
-
-#chat-input:-ms-input-placeholder {
-	color: #BBB;
-}
-
-#chat-input::-ms-input-placeholder {
+#chat-input::-moz-placeholder {
 	color: #BBB;
 }
 
@@ -718,8 +671,7 @@ button:focus {
 }
 td {
     text-align: center;
-}
-</style>
+}</style>
 	<link rel="shortcut icon" href="/favicon.ico"><script type="text/javascript" src="/app.js" async></script></head>
 	<body>
 		<div id="viewport">
@@ -748,8 +700,10 @@ td {
 		</div>
 		<div id="palette-bg"></div>
 		<span id="xy-display"></span>
-		<span id="bucket-display"></span>
-		<span id="playercount-display"></span>
+		<span id="topright-displays">
+			<span id="dinfo-display" class="framed" data-pm="1"></span>
+			<span id="playercount-display"></span>
+		</span>
 		<div id="windows" class="pixelated"></div>
 		<div id="palette">
 			<div id="palette-create">
@@ -757,7 +711,7 @@ td {
 			</div>
 			<div id="palette-colors"></div>
 		</div>
-		<button id="hub-button"><img src="/img/hub.png"/></button>
+		<button id="hub-button"><img src="/img/hub.png" /></button>
 		<div id="dev-chat" class="hide">
 			<ul id="dev-chat-messages"></ul>
 		</div>
@@ -791,24 +745,4 @@ td {
 			</div>
 		</div>
 	</body>
-    <script src="https://www.google.com/recaptcha/api.js"></script>
-	<script type="text/javascript">
-		var tabs = document.querySelectorAll('.hubtab');
-		var tabbtns = document.querySelectorAll('.hubtabbtn');
-
-		for(let i in tabbtns) {
-			let btn = tabbtns[i];
-			if(typeof btn == 'object') {;
-				btn.onclick = () => {
-					for(let i in tabs) {
-						if(typeof tabs[i] == 'object') {
-							tabs[i].hidden = true;
-                    	};
-					};
-					document.getElementById(btn.id.replace('btn', '')).hidden = false;
-				};
-			};
-		};
-	</script>
-	<!-- 	<script>if(location.host !== "ywop.scar17off.repl.co") location.reload();</script> -->
 </html>

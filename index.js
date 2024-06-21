@@ -2,6 +2,7 @@ let starttime = Date.now();
 console.log('Loading libraries, please wait...');
 const chalk = require("chalk");
 const fs = require("graceful-fs");
+const { exec } = require('child_process');
 const WebSocket = require("ws");
 const express = require("express");
 const EventEmitter = require("events");
@@ -12,6 +13,24 @@ const fetch = (...args) => import('node-fetch').then(({
     default: fetch
 }) => fetch(...args));
 const log = require('./modules/console/log.js');
+
+const appJsPath = path.join(__dirname, 'routing', 'client', 'app.js');
+const appJsMapPath = path.join(__dirname, 'routing', 'client', 'app.js.map');
+
+if (!fs.existsSync(appJsPath) || !fs.existsSync(appJsMapPath)) {
+    console.log('Building project as app.js or app.js.map does not exist...');
+    exec('npm run build', (error, stdout, stderr) => {
+        if (error) {
+            console.error(`Error during build: ${error.message}`);
+            return;
+        }
+        if (stderr) {
+            console.error(`Build stderr: ${stderr}`);
+            return;
+        }
+        console.log(`Build stdout: ${stdout}`);
+    });
+}
 
 const app = express();
 

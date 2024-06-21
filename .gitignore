@@ -11,3 +11,5 @@ replit.nix
 .cache
 client-dist/
 .env
+routing/client/*.js
+routing/client/*.js.map
