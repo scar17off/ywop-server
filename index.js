@@ -14,6 +14,9 @@ const fetch = (...args) => import('node-fetch').then(({
 }) => fetch(...args));
 const log = require('./modules/console/log.js');
 
+// Build the project if it's not already built
+const { exec } = require('child_process');
+
 const appJsPath = path.join(__dirname, 'routing', 'client', 'app.js');
 const appJsMapPath = path.join(__dirname, 'routing', 'client', 'app.js.map');
 
